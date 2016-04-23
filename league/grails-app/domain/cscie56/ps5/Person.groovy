@@ -20,8 +20,8 @@ class Person extends User{
 
     static constraints = {
         role(inList: ["Player","Coach"]);
-        firstName(nullable: false, blank: null)
-        lastName(nullable: false, blank: null)
+        firstName(nullable: false, blank: false)
+        lastName(nullable: false, blank: false)
         skill(range: 5..95)
 
     }

@@ -11,10 +11,10 @@ class Season {
     static belongsTo = [league:League];
 
     static constraints = {
-        //name(unique: true)
+        /*name(unique: true)
         startDate(nullable: false, min: new FixtureData().getLeagueStartDate())
         endDate (nullable: false, max: new FixtureData().getLeagueEndDate())
-        league (nullable: false)
+        league (nullable: false)*/
     }
 
     @Override
