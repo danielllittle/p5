@@ -1,17 +1,26 @@
 import cscie56.ps5.Game
 import cscie56.ps5.League
 import cscie56.ps5.Conference
+import cscie56.ps5.Role
 import cscie56.ps5.Season
 import cscie56.ps5.Team
 import cscie56.ps5.Person
 import cscie56.ps5.FixtureData
-
+import cscie56.ps5.User
+import cscie56.ps5.UserRole
 
 
 class BootStrap {
 
 
     def init = { servletContext ->
+
+        def adminRole = new Role(authority: 'ROLE_ADMIN').save(true)//Role.findOrSaveWhere(authority:  'ROLE_ADMIN')
+        def userRole = new Role(authority: 'ROLE_USER').save(true)// Role.findOrSaveWhere(authority: 'ROLE_USER')
+        def testUser = new User(username: 'test', password: 'test').save(true) // User.findOrSaveWhere(username:  'test'
+        def adminUser = new User(username: 'admin', password: 'admin').save(true) // User.findOrSaveWhere(username: 'adm
+        UserRole.create adminUser, adminRole, true
+        UserRole.create testUser, userRole, true
 
         Random random = new Random();
         FixtureData fixtureData = new FixtureData();
@@ -59,8 +68,10 @@ class BootStrap {
 
                     Person player = new Person(bio: fixtureData.getRandomBio(), birthPlace: fixtureData.getRandomLocation(),
                             birthDate: fixtureData.getRandomBirthdate(), universityAttended: fixtureData.getRandomUniversity(),
+                            weight: fixtureData.getRandomWeight(), inches: fixtureData.getRandomHeight(),
+                            password:  fixtureData.getRandomPassword(), username: fixtureData.getRandomUserName(),
                             firstName: fixtureData.getRandomFirstName(), lastName: fixtureData.getRandomLastName(), role: "Player",
-                            weight: fixtureData.getRandomWeight(), inches: fixtureData.getRandomHeight(), skill: fixtureData.getRandomSkill());
+                            skill: fixtureData.getRandomSkill());
                     player.team = team
                     //player.save(flush: true, failOnError: true)
                     team.addToRoster(player);
@@ -69,10 +80,11 @@ class BootStrap {
 
                 2.times { idx ->
                     Person coach = new Person(bio: fixtureData.getRandomBio(), birthPlace: fixtureData.getRandomLocation(),
-                            birthDate: fixtureData.getRandomBirthdate() , universityAttended: fixtureData.getRandomUniversity() ,
-                            firstName: fixtureData.getRandomFirstName(),
-                            weight: fixtureData.getRandomWeight(), lastName: fixtureData.getRandomLastName(), role: "Coach",
-                            inches: fixtureData.getRandomHeight(), skill: fixtureData.getRandomSkill());
+                            birthDate: fixtureData.getRandomBirthdate(), universityAttended: fixtureData.getRandomUniversity(),
+                            weight: fixtureData.getRandomWeight(), inches: fixtureData.getRandomHeight(),
+                            password:  fixtureData.getRandomPassword(), username: fixtureData.getRandomUserName(),
+                            lastName: fixtureData.getRandomLastName(), role: "Coach",
+                            skill: fixtureData.getRandomSkill());
                     coach.team = team
                     //coach.save(flush: true, failOnError: true)
                     team.addToCoaches(coach);
@@ -83,11 +95,12 @@ class BootStrap {
         }
 
         Season season = new Season(name: "2016", startDate: fixtureData.getLeagueStartDate(),
-                endDate: fixtureData.getLeagueEndDate(), league: league).save(flush: true, failOnError: true);
-        season.save(flush: true, failOnError: true)
-        println "loaded " + season
-        def teams = wconf.teams + econf.teams
+                endDate: fixtureData.getLeagueEndDate(), league: league)
 
+        if (!season.validate()) season.errors.allErrors.each{println it} else println "validated " + season
+        if (!season.save(flush: true)) season.errors.allErrors.each{println it} else println "saved " + season
+
+        def teams = wconf.teams + econf.teams
         teams.eachWithIndex {team1,idx1->
             teams.eachWithIndex { team2,idx2->
                 if (idx2 > idx1) {//avoid duplicate games
@@ -121,10 +134,7 @@ class BootStrap {
             }
         }
         println "loaded games"
-        /**iterate through sorted order to validate games are played in timm sequence.   This
-         * would impact 'Streak' and 'Last10' characteristics
 
-         (season.games.sort())*.play();*/
 
 
     }
