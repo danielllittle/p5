@@ -1,8 +1,9 @@
 package cscie56.ps5
 
+import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
-import static org.springframework.http.HttpStatus.*
+
 
 @Transactional(readOnly = true)
 class SeasonController {
@@ -11,6 +12,7 @@ class SeasonController {
 
     def StandingsService standingsService
 
+    @Secured(['ROLE_ANONYMOUS','ROLE_USER'])
     def showStandings(Season seasonInstance) {
         /*def confTeamMap
         Conference.findAll().each { conf ->

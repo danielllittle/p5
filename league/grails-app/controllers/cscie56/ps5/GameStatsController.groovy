@@ -1,5 +1,6 @@
 package cscie56.ps5
 
+import grails.plugin.springsecurity.annotation.Secured
 import grails.transaction.Transactional
 
 import static org.springframework.http.HttpStatus.*
@@ -11,6 +12,7 @@ class GameStatsController {
 
     def gameStatsService
 
+    @Secured(['ROLE_ANONYMOUS','ROLE_USER'])
     def leaderboard(League leagueInstance) {
         final int limit = params.int('limit', 5)
 
