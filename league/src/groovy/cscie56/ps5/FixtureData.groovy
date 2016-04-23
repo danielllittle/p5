@@ -349,4 +349,12 @@ class FixtureData {
 
     }
 
+    public String getRandomUserName() {
+        "un" + random.nextInt();
+    }
+
+    public String getRandomPassword() {
+        "pw" + random.nextInt();
+    }
+
 }
