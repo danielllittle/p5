@@ -23,7 +23,7 @@
 							<li role="presentation"><a href="#seasonstats" aria-controls="2" role="tab" data-toggle="tab">Season Stats</a></li>
 							<li role="presentation"><a href="#games" aria-controls="2" role="tab" data-toggle="tab">Games</a></li>
 						</g:if>
-
+						<li role="presentation"><a href="#games" aria-controls="2" role="tab" data-toggle="tab">Blog</a></li>
 					</ul>
 
 					<div class="tab-content">
@@ -112,21 +112,23 @@
 								</fieldset>
 							</g:form>
 						</div>
-						<div role="tabpanel" class="tab-pane" id="seasonstats">
+						<g:if test="${personInstance.role.equals('Player')}">
+							<div role="tabpanel" class="tab-pane" id="seasonstats">
 
-							<table class="table table-striped table-bordered table-hover"><tr><th/><th>GP</th><th>MP</th><th>P</th><th>A</th><th>R</th><th>ST</th><th class="hidden-xs">SM</th><th class="hidden-xs">SA</th>
-								<th class="hidden-xs">S%</th><th class="hidden-xs">3PM</th><th class="hidden-xs">3PA</th><th class="hidden-xs">3P%</th><th class="hidden-xs">PF</th></tr>
-								<stats:summaryStatsAbs playerGameStats="${personInstance.gameStats}"/>
-								<stats:summaryStatsAvg playerGameStats="${personInstance.gameStats}"/>
-							</table>
-						</div>
-						<div role="tabpanel" class="tab-pane" id="games">
-							<table class="table table-striped table-bordered table-hover"><tr><th>Game</th><th>MP</th><th>P</th><th>A</th><th>R</th><th>S</th><th class="hidden-xs">ST</th>
-								<th class="hidden-xs">SM</th><th class="hidden-xs">S%</th><th class="hidden-xs">3PA</th><th class="hidden-xs">3PM</th>
-								<th class="hidden-xs">3P%<th>PF</th></tr>
-								<g:render template="/person/gamesStatsRow" collection="${personInstance?.gameStats.asList().sort()}" />
-							</table>
-						</div>
+								<table class="table table-striped table-bordered table-hover"><tr><th/><th>GP</th><th>MP</th><th>P</th><th>A</th><th>R</th><th>ST</th><th class="hidden-xs">SM</th><th class="hidden-xs">SA</th>
+									<th class="hidden-xs">S%</th><th class="hidden-xs">3PM</th><th class="hidden-xs">3PA</th><th class="hidden-xs">3P%</th><th class="hidden-xs">PF</th></tr>
+									<stats:summaryStatsAbs playerGameStats="${personInstance.gameStats}"/>
+									<stats:summaryStatsAvg playerGameStats="${personInstance.gameStats}"/>
+								</table>
+							</div>
+							<div role="tabpanel" class="tab-pane" id="games">
+								<table class="table table-striped table-bordered table-hover"><tr><th>Game</th><th>MP</th><th>P</th><th>A</th><th>R</th><th>S</th><th class="hidden-xs">ST</th>
+									<th class="hidden-xs">SM</th><th class="hidden-xs">S%</th><th class="hidden-xs">3PA</th><th class="hidden-xs">3PM</th>
+									<th class="hidden-xs">3P%<th>PF</th></tr>
+									<g:render template="/person/gamesStatsRow" collection="${personInstance?.gameStats.asList().sort()}" />
+								</table>
+							</div>
+						</g:if>
 					</div>
 				</div>
 			</div>

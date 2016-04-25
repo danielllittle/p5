@@ -345,7 +345,8 @@ class FixtureData {
 
     public String getRandomBio() {
 
-        lipsum('words',15 + random.nextInt(135))
+        //lipsum('words',15 + random.nextInt(110))
+        "The quick brown fox jumped over the lazy dog."
 
     }
 

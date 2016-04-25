@@ -16,6 +16,7 @@ class PersonController {
         respond Person.list(params), model:[personInstanceCount: Person.count(), tab: "players"]
     }
 
+    @Secured(['permitAll'])
     def show(Person personInstance) {
         respond personInstance
     }

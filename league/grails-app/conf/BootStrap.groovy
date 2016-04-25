@@ -15,10 +15,16 @@ class BootStrap {
 
     def init = { servletContext ->
 
-        def adminRole = new Role(authority: 'ROLE_ADMIN').save(true)//Role.findOrSaveWhere(authority:  'ROLE_ADMIN')
-        def userRole = new Role(authority: 'ROLE_USER').save(true)// Role.findOrSaveWhere(authority: 'ROLE_USER')
-        def testUser = new User(username: 'test', password: 'test').save(true) // User.findOrSaveWhere(username:  'test'
-        def adminUser = new User(username: 'admin', password: 'admin').save(true) // User.findOrSaveWhere(username: 'adm
+        def adminRole = new Role(authority: 'ROLE_ADMIN')//Role.findOrSaveWhere(authority:  'ROLE_ADMIN')
+        def userRole = new Role(authority: 'ROLE_USER')// Role.findOrSaveWhere(authority: 'ROLE_USER')
+        def testUser = new User(username: 'test', password: 'test', birthDate: new Date(), birthPlace: "bp", bio: "bio", weight: 100, universityAttended: "UA", inches : 11) // User.findOrSaveWhere(username:  'test'
+        def adminUser = new User(username: 'admin', password: 'admin', birthDate: new Date(), birthPlace: "bp", bio: "bio", weight: 100, universityAttended: "UA", inches : 11) // User.findOrSaveWhere(username: 'adm
+
+        if (!adminRole.save(flush: true)) adminRole.errors.allErrors.each{println it} else println "loaded " + adminRole
+        if (!userRole.save(flush: true)) userRole.errors.allErrors.each{println it} else println "loaded " + userRole
+        if (!testUser.save(flush: true)) testUser.errors.allErrors.each{println it} else println "loaded " + testUser
+        if (!adminUser.save(flush: true)) adminUser.errors.allErrors.each{println it} else println "loaded " + adminUser
+
         UserRole.create adminUser, adminRole, true
         UserRole.create testUser, userRole, true
 
@@ -73,6 +79,7 @@ class BootStrap {
                             firstName: fixtureData.getRandomFirstName(), lastName: fixtureData.getRandomLastName(), role: "Player",
                             skill: fixtureData.getRandomSkill());
                     player.team = team
+                    if (!player.validate()) player.errors.allErrors.each{println it} else println "validated " + player
                     //player.save(flush: true, failOnError: true)
                     team.addToRoster(player);
 
@@ -83,10 +90,11 @@ class BootStrap {
                             birthDate: fixtureData.getRandomBirthdate(), universityAttended: fixtureData.getRandomUniversity(),
                             weight: fixtureData.getRandomWeight(), inches: fixtureData.getRandomHeight(),
                             password:  fixtureData.getRandomPassword(), username: fixtureData.getRandomUserName(),
-                            lastName: fixtureData.getRandomLastName(), role: "Coach",
+                            firstName: fixtureData.getRandomFirstName(), lastName: fixtureData.getRandomLastName(), role: "Coach",
                             skill: fixtureData.getRandomSkill());
                     coach.team = team
                     //coach.save(flush: true, failOnError: true)
+                    if (!coach.validate()) coach.errors.allErrors.each{println it} else println "validated " + coach
                     team.addToCoaches(coach);
 
                 }
