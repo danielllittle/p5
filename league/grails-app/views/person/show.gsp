@@ -23,7 +23,7 @@
 							<li role="presentation"><a href="#seasonstats" aria-controls="2" role="tab" data-toggle="tab">Season Stats</a></li>
 							<li role="presentation"><a href="#games" aria-controls="2" role="tab" data-toggle="tab">Games</a></li>
 						</g:if>
-						<li role="presentation"><a href="#games" aria-controls="2" role="tab" data-toggle="tab">Blog</a></li>
+						<li role="presentation"><a href="#blogentry" aria-controls="2" role="tab" data-toggle="tab">Blog</a></li>
 					</ul>
 
 					<div class="tab-content">
@@ -129,8 +129,77 @@
 								</table>
 							</div>
 						</g:if>
+						<div role="tabpanel" class="tab-pane" id="blogentry">
+
+							<g:if test="${flash.message}">
+								<div class="message" role="status">${flash.message}</div>
+							</g:if>
+							<br>
+							<g:if test="${!personInstance.blogEntries}"><tr><td>No blog entries</td></tr></g:if>
+							<g:else>
+								<table>
+									<thead>
+										<tr><td>Date</td><td>Text</td>
+									</tr>
+									</thead>
+
+									<tbody>
+
+									<g:each in="${personInstance.blogEntries}" status="i" var="blogEntry">
+										<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+
+											<td><g:link action="show"
+														id="${blogEntry.id}">${fieldValue(bean: blogEntry, field: "dateCreated")}</g:link></td>
+
+											<td><g:formatDate date="${blogEntry.datePublished}"/></td>
+
+											<td><g:formatBoolean boolean="${blogEntry.published}"/></td>
+
+											<td>${fieldValue(bean: blogEntry, field: "text")}</td
+
+										</tr>
+									</g:each>
+									</tbody>
+								</table>
+							</g:else>
+							</br></br>
+							<sec:ifLoggedIn>
+								<button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal">Create blog entry></button>
+							</sec:ifLoggedIn>
+						</div>
 					</div>
 				</div>
+			</div>
+		</div>
+		<div id="myModal" class="modal fade" role="dialog">
+			<div class="modal-dialog">
+
+				<!-- Modal content-->
+				<div class="modal-content">
+					<g:form controller="blogEntry" action="ajaxsave">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">Create Blog Entry</h4>
+						</div>
+						<div class="modal-body">
+
+							<g:hiddenField name="player.id" value="${personInstance.id}" />
+
+
+							<div class="form-group">
+								<label for="usrname"><span class="glyphicon glyphicon-user"></span> Blog Entry</label>
+								<g:textField  class="form-control" name="text" placeholder="Enter text"/>
+							</div>
+							<br><br>Ok to Publish? <g:checkBox name="published" value="checked" />
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							<g:submitButton name="submitbtn" class="btn btn-primary"  action="ajaxsave" value="Submit"/>
+
+						</div>
+					</g:form>
+				</div>
+
 			</div>
 		</div>
 	</body>

@@ -1,7 +1,5 @@
 package cscie56.ps5
 
-
-
 import grails.plugin.springsecurity.annotation.Secured
 import cscie56.ps5.User
 
@@ -28,11 +26,30 @@ class BlogEntryController {
 
     @Secured(['ROLE_USER', 'ROLE_ADMIN'])
     def create() {
-        respond new BlogEntry(params)
+        def user = springSecurityService.currentUser
+        if (user != null) {
+            respond new BlogEntry(params)
+        }
     }
 
-    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
-    @Transactional
+    @Secured(['ROLE_USER'])
+    def ajaxsave() {
+        println "ajaxsave begin"
+        BlogEntry blogEntry = new BlogEntry(params)
+        blogEntry.dateCreated = new Date();
+        if (blogEntry.published) {
+            blogEntry.datePublished = new Date();
+        }
+        println "ajaxsave before user"
+        User person = User.findById(params.getLong("playerid"))
+        println "ajaxsave after user"
+        person.blogEntries.add(blogEntry);
+        println "ajaxsave end"
+        save(blogEntry)
+    }
+
+
+    @Secured(['ROLE_USER'])
     def save(BlogEntry blogEntry) {
         println "save begin"
         if (blogEntry == null) {
@@ -40,14 +57,15 @@ class BlogEntryController {
             return
         }
 
+        blogEntry.errors.allErrors.each{println it}
         if (blogEntry.hasErrors()) {
             respond blogEntry.errors, view:'create'
             return
         }
 
-        blogEntry.errors.allErrors.each{println it}
         if (!blogEntry.save(flush: true)) blogEntry.errors.allErrors.each{println it} else println "saved " + blogEntry
         //blogEntry.save flush:true
+        User.findById(blogEntry.player.id)
 
         request.withFormat {
             form multipartForm {
@@ -56,29 +74,6 @@ class BlogEntryController {
             }
             '*' { respond blogEntry, [status: CREATED] }
         }
-    }
-
-    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
-    @Transactional
-    def ajaxsave() {
-        println "ajaxsave begin"
-        BlogEntry blogEntry = new BlogEntry()
-        blogEntry.dateCreated = new Date();
-        blogEntry.text = (String) params.get("text")
-        blogEntry.published = "checked".equals((String) params.get("published"))
-        if (blogEntry.published) {
-            blogEntry.datePublished = new Date();
-        }
-        println "ajaxsave before user"
-        User person = User.findById(params.getLong("player.id"))
-        println "ajaxsave after user"
-        blogEntry.player = person
-        person.addToBlogEntries(blogEntry);
-        println "ajaxsave saving"
-        blogEntry.save flush:true
-        println "ajaxsave end"
-
-        render status: NO_CONTENT
     }
 
     def edit(BlogEntry blogEntry) {

@@ -10,7 +10,7 @@ class PersonController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    @Secured(['ROLE_ANONYMOUS','ROLE_USER'])
+    @Secured(['permitAll'])
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond Person.list(params), model:[personInstanceCount: Person.count(), tab: "players"]

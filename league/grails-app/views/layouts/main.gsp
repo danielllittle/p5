@@ -42,7 +42,7 @@
 			<ul class="nav navbar-nav">
 				<li<g:if test="${tab == 'leaders'}"> class="active"</g:if>><a href="/league/league/leaderboard">Leaderboard <span class="sr-only">(current)</span></a></li>
 				<li<g:if test="${tab == "standings"}"> class="active"</g:if>><a href="/league/season/showStandings/1">Standings <span class="sr-only">(current)</span></a></li>
-				<li<g:if test="${tab == "players"}"> class="active"</g:if>><a href="/leagure/person/index">Players <span class="sr-only">(current)</span></a></li>
+				<li<g:if test="${tab == "players"}"> class="active"</g:if>><a href="/league/person/index">Players <span class="sr-only">(current)</span></a></li>
 			</ul>
 
 		</div><!-- /.navbar-collapse -->

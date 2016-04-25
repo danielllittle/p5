@@ -80,7 +80,7 @@ class BootStrap {
                             skill: fixtureData.getRandomSkill());
                     player.team = team
                     if (!player.validate()) player.errors.allErrors.each{println it} else println "validated " + player
-                    //player.save(flush: true, failOnError: true)
+                    player.save(flush: true, failOnError: true)
                     team.addToRoster(player);
 
                 }
@@ -93,7 +93,7 @@ class BootStrap {
                             firstName: fixtureData.getRandomFirstName(), lastName: fixtureData.getRandomLastName(), role: "Coach",
                             skill: fixtureData.getRandomSkill());
                     coach.team = team
-                    //coach.save(flush: true, failOnError: true)
+                    coach.save(flush: true, failOnError: true)
                     if (!coach.validate()) coach.errors.allErrors.each{println it} else println "validated " + coach
                     team.addToCoaches(coach);
 
@@ -123,7 +123,7 @@ class BootStrap {
                         if (game1.getDatetime() < new Date()) {  //play game w
                             fixtureData.createGameStats(game1).each {
                                 it.game = game1
-                                it.save()
+                                it.save(flush: true, failOnError: true)
                                 game1.addToGameStats(it)
                             }
                         }
@@ -134,19 +134,15 @@ class BootStrap {
                                 game2.addToGameStats(it)
                             }
                         }
-                        season.addToGames(game1);
-                        season.addToGames(game2);
+                        season.addToGames(game1)
+                        season.addToGames(game2)
                     }
 
                 }
             }
         }
         println "loaded games"
-
-
-
     }
-
 
     def destroy = {
     }

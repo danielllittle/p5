@@ -26,6 +26,8 @@ class User implements Serializable {
 	boolean accountLocked
 	boolean passwordExpired
 
+	static hasMany = [blogEntries: BlogEntry]
+
 	User(String username, String password) {
 		this()
 		this.username = username
@@ -56,11 +58,11 @@ class User implements Serializable {
 		username blank: false, unique: true
 		password blank: false
 		bio(maxSize: 1023)
+		blogEntries nullable: true
 	}
 
 	static mapping = {
 		password column: '`password`'
 	}
 
-	static hasMany = [BlogEntry]
 }
