@@ -41,6 +41,17 @@
 				</li>
 				</g:if>
 			
+				<g:if test="${comment?.comments}">
+				<li class="fieldcontain">
+					<span id="comments-label" class="property-label"><g:message code="comment.comments.label" default="Comments" /></span>
+					
+						<g:each in="${comment.comments}" var="c">
+						<span class="property-value" aria-labelledby="comments-label"><g:link controller="comment" action="show" id="${c.id}">${c?.encodeAsHTML()}</g:link></span>
+						</g:each>
+					
+				</li>
+				</g:if>
+			
 				<g:if test="${comment?.dateCreated}">
 				<li class="fieldcontain">
 					<span id="dateCreated-label" class="property-label"><g:message code="comment.dateCreated.label" default="Date Created" /></span>
@@ -55,6 +66,42 @@
 					<span id="datePublished-label" class="property-label"><g:message code="comment.datePublished.label" default="Date Published" /></span>
 					
 						<span class="property-value" aria-labelledby="datePublished-label"><g:formatDate date="${comment?.datePublished}" /></span>
+					
+				</li>
+				</g:if>
+			
+				<g:if test="${comment?.owner}">
+				<li class="fieldcontain">
+					<span id="owner-label" class="property-label"><g:message code="comment.owner.label" default="Owner" /></span>
+					
+						<span class="property-value" aria-labelledby="owner-label"><g:link controller="user" action="show" id="${comment?.owner?.id}">${comment?.owner?.encodeAsHTML()}</g:link></span>
+					
+				</li>
+				</g:if>
+			
+				<g:if test="${comment?.player}">
+				<li class="fieldcontain">
+					<span id="player-label" class="property-label"><g:message code="comment.player.label" default="Player" /></span>
+					
+						<span class="property-value" aria-labelledby="player-label"><g:link controller="user" action="show" id="${comment?.player?.id}">${comment?.player?.encodeAsHTML()}</g:link></span>
+					
+				</li>
+				</g:if>
+			
+				<g:if test="${comment?.published}">
+				<li class="fieldcontain">
+					<span id="published-label" class="property-label"><g:message code="comment.published.label" default="Published" /></span>
+					
+						<span class="property-value" aria-labelledby="published-label"><g:formatBoolean boolean="${comment?.published}" /></span>
+					
+				</li>
+				</g:if>
+			
+				<g:if test="${comment?.rejected}">
+				<li class="fieldcontain">
+					<span id="rejected-label" class="property-label"><g:message code="comment.rejected.label" default="Rejected" /></span>
+					
+						<span class="property-value" aria-labelledby="rejected-label"><g:formatBoolean boolean="${comment?.rejected}" /></span>
 					
 				</li>
 				</g:if>

@@ -104,43 +104,7 @@ class BlogEntryController {
         }
     }
 
-    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
-    @Transactional
-    def ajaxpublishcomments() {
-        println "ajaxpublishcomments begin"
-        BlogEntry blogEntry = BlogEntry.findById(params.getLong("blog.id"))
-        if (blogEntry.owner.id != springSecurityService.principal.id) {
-            render "unauthorized"
-        } else {
-            Comment comment = Comment.findById(params.getLong("comment.id"))
-            comment.approved = true
-            if (!comment.save(flush: true)) comment.errors.allErrors.each {
-                println it
-            } else println "saved " + comment
-            //blogEntry.save flush:true
-            println "ajaxpublishcomments end"
-            render "approved"
-        }
-    }
 
-    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
-    @Transactional
-    def ajaxrejectcomments() {
-        println "ajaxpublishcomments begin"
-        BlogEntry blogEntry = BlogEntry.findById(params.getLong("blog.id"))
-        if (blogEntry.owner.id != springSecurityService.principal.id) {
-            render "unauthorized"
-        } else {
-            Comment comment = Comment.findById(params.getLong("comment.id"))
-            comment.approved = false
-            if (!comment.save(flush: true)) comment.errors.allErrors.each {
-                println it
-            } else println "saved " + comment
-            //blogEntry.save flush:true
-            println "ajaxpublishcomments end"
-            render "rejected"
-        }
-    }
 
 
     def edit(BlogEntry blogEntry) {

@@ -32,7 +32,9 @@
 					
 						<g:sortableColumn property="datePublished" title="${message(code: 'comment.datePublished.label', default: 'Date Published')}" />
 					
-						<g:sortableColumn property="text" title="${message(code: 'comment.text.label', default: 'Text')}" />
+						<th><g:message code="comment.owner.label" default="Owner" /></th>
+					
+						<th><g:message code="comment.player.label" default="Player" /></th>
 					
 					</tr>
 				</thead>
@@ -48,7 +50,9 @@
 					
 						<td><g:formatDate date="${comment.datePublished}" /></td>
 					
-						<td>${fieldValue(bean: comment, field: "text")}</td>
+						<td>${fieldValue(bean: comment, field: "owner")}</td>
+					
+						<td>${fieldValue(bean: comment, field: "player")}</td>
 					
 					</tr>
 				</g:each>

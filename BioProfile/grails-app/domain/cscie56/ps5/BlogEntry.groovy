@@ -18,5 +18,8 @@ class BlogEntry {
         comments sort: 'datePublished', order: 'desc'
     }
 
+    static transients = ['type']
+    String type = "Blog"
+
 
 }

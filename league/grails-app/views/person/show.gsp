@@ -142,16 +142,15 @@
 							<g:else>
 								<table class="table table-striped table-bordered table-hover">
 
-										<tr><td>Blog Owner</td><td>Date</td><td>Text</td><td>Publish</td></tr>
+										<tr><td>Discussion</td><td>Owner</td><td>Date</td><td>Text</td><td>Publish</td><td>Reply</td></tr>
 									<g:each in="${personInstance.blogEntries}" status="i" var="blogEntry">
-										<g:if test="${blogEntry.published || (blogEntry.owner.id == Integer.parseInt(sec.loggedInUserInfo(field: 'id').toString()))}">
+										<g:if test="${"Blog".equals(blogEntry.type) && (blogEntry.published || (blogEntry.owner.id == Integer.parseInt(sec.loggedInUserInfo(field: 'id').toString())))}">
 											<tr class="${(i % 2) == 1 ? 'even' : 'odd'}">
 
+												<td>${blogEntry.type}${blogEntry.id}</td>
+												<td>${fieldValue(bean: blogEntry, field: "text")}</td>
 												<td>${blogEntry.owner.username }</td>
 												<td><g:formatDate format="MMM-dd-yyyy hh:mm:ss a" date="${blogEntry.dateCreated}"/></td>
-
-
-												<td>${fieldValue(bean: blogEntry, field: "text")}</td>
 												<td>
 													<div id="publish${blogEntry.id}">
 													<g:if test="${!blogEntry.published}">
@@ -162,8 +161,52 @@
 													</g:if>
 													</div>
 												</td>
+												<td>
+													<div id="publish${blogEntry.id}">
+														<g:if test="${blogEntry.published}">
+															<sec:ifLoggedIn>
+																<button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModalComment">Comment</button>
+															</sec:ifLoggedIn>
+															<!--<g:form controller="blogEntry" action="ajaxpublish">
+																<input type="hidden" name="blog.id" value="${blogEntry.id}"/>
+																<g:submitToRemote url="[controller:'blogEntry', action:'ajaxpublish']" update="publish${blogEntry.id}" value="Publish"/>
+															</g:form>-->
+														</g:if>
+													</div>
+												</td>
 
 											</tr>
+											<g:each in="${blogEntry.comments}" status="j" var="comment">
+												<g:if test="${comment.approved || (blogEntry.owner.id == Integer.parseInt(sec.loggedInUserInfo(field: 'id').toString()))}">
+													<tr>
+														<td>${comment.type}${comment.id}${blogEntry.id}</td>
+														<td><g:if test="$comment.rejected"><s></g:if>${fieldValue(bean: comment, field: "text")}<g:if test="$comment.rejected"></s></g:if></td>
+														<td>${comment.owner.username }</td>
+														<td><g:formatDate format="MMM-dd-yyyy hh:mm:ss a" date="${comment.dateCreated}"/></td>
+														<td>
+															<div id="approvecomment${blogEntry.id}">
+																<g:if test="${!comment.approved && !comment.rejected}">
+																	<g:form controller="comment" action="ajaxapprove">
+																		<input type="hidden" name="blog.id" value="${blogEntry.id}"/>
+																		<input type="hidden" name="comment.id" value="${comment.id}"/>
+																		<g:submitToRemote url="[controller:'comment', action:'ajaxapprove']" update="approvecomment${blogEntry.id}" value="Approve"/>
+																	</g:form>
+																	<g:form controller="comment" action="ajaxreject">
+																		<input type="hidden" name="blog.id" value="${blogEntry.id}"/>
+																		<input type="hidden" name="comment.id" value="${comment.id}"/>
+																		<g:submitToRemote url="[controller:'comment', action:'ajaxreject']" update="approvecomment${blogEntry.id}" value="Reject"/>
+																	</g:form>
+																</g:if>
+															</div>
+														</td>
+														<td></td>
+
+													</tr>
+
+												</g:if>
+
+											</g:each>
+
 										</g:if>
 									</g:each>
 
@@ -213,5 +256,40 @@
 
 			</div>
 		</div>
+	<div id="myModalComment" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<g:form controller="comment" action="ajaxsave">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Create Comment Entry</h4>
+					</div>
+					<div class="modal-body">
+
+						<g:hiddenField name="player.id" value="${personInstance.id}" />
+						<g:hiddenField name="owner.id" value="${sec.loggedInUserInfo(field:"id")}"/>
+						<g:hiddenField name="blog.id" value="1"/>
+
+						<div class="form-group">
+							<label for="usrname"><span class="glyphicon glyphicon-user"></span> Comment Entry</label>
+							<g:textField  class="form-control" name="text" placeholder="Enter text"/>
+						</div>
+
+					</div>
+					<div class="modal-footer">
+						<!--button type="button" class="btn btn-default" data-dismiss="modal">Close</button-->
+						<div id="commentsubmit"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button><g:submitButton name="submitbtn" class="btn btn-primary"  data-dismiss="modal action="ajaxsave" value="Submit"/></div>
+
+
+					</div>
+
+
+				</g:form>
+			</div>
+		</div>
+	</div>
+
 	</body>
 </html>

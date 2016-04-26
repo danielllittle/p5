@@ -12,9 +12,7 @@ class CommentController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    @Secured(['ROLE_USER', 'ROLE_ADMIN', 'ROLE_ANONYMOUS'])
     def index(Integer max) {
-        def user = springSecurityService.currentUser
         params.max = Math.min(max ?: 10, 100)
         respond Comment.list(params), model:[commentCount: Comment.count()]
     }
@@ -23,42 +21,96 @@ class CommentController {
         respond comment
     }
 
+    def create() {
+        respond new Comment(params)
+    }
 
     @Secured(['ROLE_USER', 'ROLE_ADMIN'])
-    def create() {
-        if (springSecurityService.isLoggedIn()) {
-            respond new Comment(params)
+    @Transactional
+    def ajaxapprove() {
+        println "ajaxpublishcomments begin"
+        BlogEntry blogEntry = BlogEntry.findById(params.getLong("blog.id"))
+        if (blogEntry.owner.id != springSecurityService.principal.id) {
+            render "unauthorized"
         } else {
-            notFound()
+            Comment comment = Comment.findById(params.getLong("comment.id"))
+            comment.approved = true
+            if (!comment.save(flush: true)) comment.errors.allErrors.each {
+                println it
+            } else println "saved " + comment
+            //blogEntry.save flush:true
+            println "ajaxpublishcomments end"
+            render "approved"
         }
     }
 
-    @Transactional
     @Secured(['ROLE_USER', 'ROLE_ADMIN'])
-    def save(Comment comment) {
-        if (springSecurityService.isLoggedIn()) {
-            if (comment == null) {
-                notFound()
-                return
-            }
-
-
-            if (comment.hasErrors()) {
-                respond comment.errors, view: 'create'
-                return
-            }
-
-            comment.save flush: true
-
-            request.withFormat {
-                form multipartForm {
-                    flash.message = message(code: 'default.created.message', args: [message(code: 'comment.label', default: 'Comment'), comment.id])
-                    redirect comment
-                }
-                '*' { respond comment, [status: CREATED] }
-            }
+    @Transactional
+    def ajaxreject() {
+        println "ajaxreject begin"
+        BlogEntry blogEntry = BlogEntry.findById(params.getLong("blog.id"))
+        if (blogEntry.owner.id != springSecurityService.principal.id) {
+            render "unauthorized"
         } else {
+            Comment comment = Comment.findById(params.getLong("comment.id"))
+            comment.rejected = true
+            if (!comment.save(flush: true)) comment.errors.allErrors.each {
+                println it
+            } else println "saved " + comment
+            //blogEntry.save flush:true
+            println "ajaxreject end"
+            render "rejected"
+        }
+    }
+
+    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
+    @Transactional
+    def ajaxsave() {
+        println "ajaxsave begin"
+        Comment comment = new Comment()
+        comment.dateCreated = new Date();
+        comment.text = (String) params.get("text")
+        comment.published = true
+        comment.datePublished = new Date()
+        comment.errors.allErrors.each{println it}
+        User person = User.findById(params.getLong("player.id"))
+        println "ajaxsave after findplay"
+        comment.player = person
+        comment.owner = springSecurityService.currentUser
+        if (!comment.save(flush: true)) comment.errors.allErrors.each{println it} else println "saved " + comment
+        println "loading blog with id: " + params.getLong("blog.id")
+
+        BlogEntry blog = BlogEntry.findById(params.getLong("blog.id"))
+
+        blog.addToComments(comment)
+        println "ajaxsave saving"
+        blog.save flush:true
+
+        println "ajaxsave end"
+
+        render status: NO_CONTENT
+    }
+
+    @Transactional
+    def save(Comment comment) {
+        if (comment == null) {
             notFound()
+            return
+        }
+
+        if (comment.hasErrors()) {
+            respond comment.errors, view:'create'
+            return
+        }
+
+        comment.save flush:true
+
+        request.withFormat {
+            form multipartForm {
+                flash.message = message(code: 'default.created.message', args: [message(code: 'comment.label', default: 'Comment'), comment.id])
+                redirect comment
+            }
+            '*' { respond comment, [status: CREATED] }
         }
     }
 
@@ -108,7 +160,6 @@ class CommentController {
         }
     }
 
-    @Secured(['ROLE_USER', 'ROLE_ADMIN', 'ROLE_ANONYMOUS'])
     protected void notFound() {
         request.withFormat {
             form multipartForm {
