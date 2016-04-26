@@ -7,7 +7,7 @@ class BlogEntry {
     Date datePublished
     boolean published
 
-    static belongsTo = [player: User]
+    static belongsTo = [player: User, owner: User]
 
     static hasMany = [comments : Comment]
 
@@ -17,4 +17,6 @@ class BlogEntry {
     static mapping = {
         comments sort: 'datePublished', order: 'desc'
     }
+
+
 }

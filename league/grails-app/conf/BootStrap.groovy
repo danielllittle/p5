@@ -80,7 +80,7 @@ class BootStrap {
                             skill: fixtureData.getRandomSkill());
                     player.team = team
                     if (!player.validate()) player.errors.allErrors.each{println it} else println "validated " + player
-                    player.save(flush: true, failOnError: true)
+                    //player.save(flush: true, failOnError: true)
                     team.addToRoster(player);
 
                 }
@@ -93,7 +93,7 @@ class BootStrap {
                             firstName: fixtureData.getRandomFirstName(), lastName: fixtureData.getRandomLastName(), role: "Coach",
                             skill: fixtureData.getRandomSkill());
                     coach.team = team
-                    coach.save(flush: true, failOnError: true)
+                    //coach.save(flush: true, failOnError: true)
                     if (!coach.validate()) coach.errors.allErrors.each{println it} else println "validated " + coach
                     team.addToCoaches(coach);
 

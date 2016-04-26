@@ -1,15 +1,14 @@
 package cscie56.ps5
 
-class Comment {
+class Comment extends BlogEntry {
 
-    String text
-    Date dateCreated
-    Date datePublished
+
     boolean approved
+    boolean rejected
+
 
 
     static belongsTo = [ blogEntry : BlogEntry ]
-
 
 
 }

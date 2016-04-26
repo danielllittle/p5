@@ -23,7 +23,6 @@ class Person extends User{
         firstName(nullable: false, blank: false)
         lastName(nullable: false, blank: false)
         skill(range: 5..95)
-
     }
 
     static transients = ['fullName']

@@ -6,6 +6,9 @@
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'person.label', default: 'Person')}" />
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
+		<script>$('#myModal').on('hidden.bs.modal', function () {
+			window.location.reload(true);
+		});</script>
 	</head>
 	<body>
 		<div class = "container">
@@ -137,29 +140,33 @@
 							<br>
 							<g:if test="${!personInstance.blogEntries}"><tr><td>No blog entries</td></tr></g:if>
 							<g:else>
-								<table>
-									<thead>
-										<tr><td>Date</td><td>Text</td>
-									</tr>
-									</thead>
+								<table class="table table-striped table-bordered table-hover">
 
-									<tbody>
-
+										<tr><td>Blog Owner</td><td>Date</td><td>Text</td><td>Publish</td></tr>
 									<g:each in="${personInstance.blogEntries}" status="i" var="blogEntry">
-										<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+										<g:if test="${blogEntry.published || (blogEntry.owner.id == Integer.parseInt(sec.loggedInUserInfo(field: 'id').toString()))}">
+											<tr class="${(i % 2) == 1 ? 'even' : 'odd'}">
 
-											<td><g:link action="show"
-														id="${blogEntry.id}">${fieldValue(bean: blogEntry, field: "dateCreated")}</g:link></td>
+												<td>${blogEntry.owner.username }</td>
+												<td><g:formatDate format="MMM-dd-yyyy hh:mm:ss a" date="${blogEntry.dateCreated}"/></td>
 
-											<td><g:formatDate date="${blogEntry.datePublished}"/></td>
 
-											<td><g:formatBoolean boolean="${blogEntry.published}"/></td>
+												<td>${fieldValue(bean: blogEntry, field: "text")}</td>
+												<td>
+													<div id="publish${blogEntry.id}">
+													<g:if test="${!blogEntry.published}">
+														<g:form controller="blogEntry" action="ajaxpublish">
+															<input type="hidden" name="blog.id" value="${blogEntry.id}"/>
+															<g:submitToRemote url="[controller:'blogEntry', action:'ajaxpublish']" update="publish${blogEntry.id}" value="Publish"/>
+														</g:form>
+													</g:if>
+													</div>
+												</td>
 
-											<td>${fieldValue(bean: blogEntry, field: "text")}</td
-
-										</tr>
+											</tr>
+										</g:if>
 									</g:each>
-									</tbody>
+
 								</table>
 							</g:else>
 							</br></br>
@@ -184,19 +191,23 @@
 						<div class="modal-body">
 
 							<g:hiddenField name="player.id" value="${personInstance.id}" />
+							<g:hiddenField name="owner.id" value="${sec.loggedInUserInfo(field:"id")}"/>
 
 
 							<div class="form-group">
 								<label for="usrname"><span class="glyphicon glyphicon-user"></span> Blog Entry</label>
 								<g:textField  class="form-control" name="text" placeholder="Enter text"/>
 							</div>
-							<br><br>Ok to Publish? <g:checkBox name="published" value="checked" />
+
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-							<g:submitButton name="submitbtn" class="btn btn-primary"  action="ajaxsave" value="Submit"/>
+							<g:submitButton name="submitbtn" class="btn btn-primary"  data-dismiss="modal action="ajaxsave" value="Submit"/>
+							<g:submitButton name="submitpubbtn" class="btn btn-primary"  data-dismiss="modal action="ajaxsave" value="Submit and Publish"/>
 
 						</div>
+
+
 					</g:form>
 				</div>
 

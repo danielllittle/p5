@@ -26,7 +26,8 @@ class User implements Serializable {
 	boolean accountLocked
 	boolean passwordExpired
 
-	static hasMany = [blogEntries: BlogEntry]
+	static hasMany = [blogEntries: BlogEntry, publishedBlogEntries: BlogEntry]
+
 
 	User(String username, String password) {
 		this()
@@ -51,6 +52,8 @@ class User implements Serializable {
 	protected void encodePassword() {
 		password = springSecurityService?.passwordEncoder ? springSecurityService.encodePassword(password) : password
 	}
+
+	static mappedBy = [blogEntries:'player', publishedBlogEntries : 'owner']
 
 	static transients = ['springSecurityService']
 
