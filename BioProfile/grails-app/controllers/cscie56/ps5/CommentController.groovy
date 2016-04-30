@@ -40,7 +40,8 @@ class CommentController {
             } else println "saved " + comment
             //blogEntry.save flush:true
             println "ajaxpublishcomments end"
-            render "approved"
+            render (plugin: "bio-profile", template: "/comment/comment_row", model: ['comment': comment, 'blog' : blogEntry] )
+
         }
     }
 
@@ -59,8 +60,10 @@ class CommentController {
             } else println "saved " + comment
             //blogEntry.save flush:true
             println "ajaxreject end"
-            render "rejected"
+            render (plugin: "bio-profile", template: "/comment/comment_row", model: ['comment': comment, 'blog' : blogEntry])
+
         }
+
     }
 
     @Secured(['ROLE_USER', 'ROLE_ADMIN'])
@@ -69,7 +72,7 @@ class CommentController {
         println "ajaxsave begin"
         Comment comment = new Comment()
         comment.dateCreated = new Date();
-        comment.text = (String) params.get("text")
+        comment.text = (String) params.get("commenttext")
         comment.published = true
         comment.datePublished = new Date()
         comment.errors.allErrors.each{println it}
@@ -88,7 +91,8 @@ class CommentController {
 
         println "ajaxsave end"
 
-        render status: NO_CONTENT
+        render(plugin: "bio-profile", template:"/blogEntry/blogentries", model: ['blogentriescoll' : person?.blogEntries, 'userid': springSecurityService.principal.id])
+        //render status: NO_CONTENT
     }
 
     @Transactional

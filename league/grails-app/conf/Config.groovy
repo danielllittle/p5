@@ -131,3 +131,5 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
         '/**/favicon.ico':  ['permitAll'],
         '/dbconsole/**':  	['permitAll']
 ]
+
+grails.plugin.springsecurity.logout.postOnly = false

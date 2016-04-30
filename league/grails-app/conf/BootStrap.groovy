@@ -18,15 +18,18 @@ class BootStrap {
         def adminRole = new Role(authority: 'ROLE_ADMIN')//Role.findOrSaveWhere(authority:  'ROLE_ADMIN')
         def userRole = new Role(authority: 'ROLE_USER')// Role.findOrSaveWhere(authority: 'ROLE_USER')
         def testUser = new User(username: 'test', password: 'test', birthDate: new Date(), birthPlace: "bp", bio: "bio", weight: 100, universityAttended: "UA", inches : 11) // User.findOrSaveWhere(username:  'test'
+        def altUser = new User(username: 'alt', password: 'alt', birthDate: new Date(), birthPlace: "bp", bio: "bio", weight: 100, universityAttended: "UA", inches : 11) // User.findOrSaveWhere(username:  'test'
         def adminUser = new User(username: 'admin', password: 'admin', birthDate: new Date(), birthPlace: "bp", bio: "bio", weight: 100, universityAttended: "UA", inches : 11) // User.findOrSaveWhere(username: 'adm
 
         if (!adminRole.save(flush: true)) adminRole.errors.allErrors.each{println it} else println "loaded " + adminRole
         if (!userRole.save(flush: true)) userRole.errors.allErrors.each{println it} else println "loaded " + userRole
         if (!testUser.save(flush: true)) testUser.errors.allErrors.each{println it} else println "loaded " + testUser
         if (!adminUser.save(flush: true)) adminUser.errors.allErrors.each{println it} else println "loaded " + adminUser
+        if (!altUser.save(flush: true)) altUser.errors.allErrors.each{println it} else println "loaded " + altUser
 
         UserRole.create adminUser, adminRole, true
         UserRole.create testUser, userRole, true
+        UserRole.create altUser, userRole, true
 
         Random random = new Random();
         FixtureData fixtureData = new FixtureData();

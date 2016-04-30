@@ -9,6 +9,7 @@ import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 
 @Transactional(readOnly = true)
+@Secured(['ROLE_USER'])
 class BlogEntryController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
@@ -21,17 +22,14 @@ class BlogEntryController {
         respond BlogEntry.list(params), model:[blogEntryCount: BlogEntry.count()]
     }
 
-    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
     def show(BlogEntry blogEntry) {
         respond blogEntry
     }
 
-    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
     def create() {
         respond new BlogEntry(params)
     }
 
-    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
     @Transactional
     def save(BlogEntry blogEntry) {
         println "save begin"
@@ -58,16 +56,18 @@ class BlogEntryController {
         }
     }
 
-    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
     @Transactional
     def ajaxsave() {
         println "ajaxsave begin"
         BlogEntry blogEntry = new BlogEntry()
         blogEntry.dateCreated = new Date();
-        blogEntry.text = (String) params.get("text")
-        if (params.get("submitpubbtn") != null) {
+        blogEntry.text = (String) params.get("blogtext")
+        if ("publish".equals(params.get("method"))) {
+            println "ajaxsave - now publishing"
             blogEntry.datePublished = new Date();
             blogEntry.published = true;
+        } else {
+            println "ajaxsave - not publishing"
         }
         println "ajaxsave before user"
         User person = User.findById(params.getLong("player.id"))
@@ -82,10 +82,9 @@ class BlogEntryController {
         blogEntry.save flush:true
         println "ajaxsave end"
 
-        render status: NO_CONTENT
+        render(plugin: "bio-profile", template:"/blogEntry/blogentries", model: ['blogentriescoll' : person?.blogEntries,'userid': springSecurityService.principal.id])
     }
 
-    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
     @Transactional
     def ajaxpublish() {
         println "ajaxpublsh begin"
@@ -100,7 +99,8 @@ class BlogEntryController {
             } else println "saved " + blogEntry
             //blogEntry.save flush:true
             println "ajaxpublsh end"
-            render "published"
+
+            render(plugin: "bio-profile", template:"/blogEntry/blog_row", model: ['blogEntry': blogEntry])
         }
     }
 

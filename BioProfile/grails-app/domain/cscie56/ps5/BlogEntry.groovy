@@ -14,9 +14,9 @@ class BlogEntry {
     static constraints = {
         datePublished nullable: true
     }
-    static mapping = {
-        comments sort: 'datePublished', order: 'desc'
-    }
+    /*static mapping = {
+            comments sort: 'datePublished', order: 'desc'
+    }*/
 
     static transients = ['type']
     String type = "Blog"

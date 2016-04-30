@@ -2,6 +2,9 @@ grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 
+def gebVersion = "0.13.1"
+def seleniumVersion = "2.51.0"
+
 grails.project.fork = [
     // configure settings for compilation JVM, note that if you alter the Groovy version forked compilation is required
     //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
@@ -37,11 +40,15 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
+        test "org.gebish:geb-spock:$gebVersion"
+
+        test("org.seleniumhq.selenium:selenium-firefox-driver:$seleniumVersion")
     }
 
     plugins {
         plugins {
             compile ':spring-security-core:2.0.0'
+            test ":geb:$gebVersion"
             compile ":scaffolding:2.1.2"
         }
         build(":release:3.1.1",

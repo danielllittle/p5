@@ -40,11 +40,23 @@
 		<!-- Collect the nav links, forms, and other content for toggling -->
 		<div class="collapse navbar-collapse" id="navbar">
 			<ul class="nav navbar-nav">
-				<li<g:if test="${tab == 'leaders'}"> class="active"</g:if>><a href="/league/league/leaderboard">Leaderboard <span class="sr-only">(current)</span></a></li>
-				<li<g:if test="${tab == "standings"}"> class="active"</g:if>><a href="/league/season/showStandings/1">Standings <span class="sr-only">(current)</span></a></li>
-				<li<g:if test="${tab == "players"}"> class="active"</g:if>><a href="/league/person/index">Players <span class="sr-only">(current)</span></a></li>
-				<li><sec:ifLoggedIn><g:link controller='logout'>Logout<span class="sr-only">(current)</span></g:link></sec:ifLoggedIn><sec:ifNotLoggedIn><a href="/league/login/auth">Login</a> <span class="sr-only">(current)</span></sec:ifNotLoggedIn></li>
+				<li<g:if test="${tab == 'leaders'}"> class="active"</g:if>><a id="leaderboardLink" href="/league/league/leaderboard">Leaderboard <span class="sr-only">(current)</span></a></li>
+				<li<g:if test="${tab == "standings"}"> class="active"</g:if>><a id="standingsLink" href="/league/season/showStandings/1">Standings <span class="sr-only">(current)</span></a></li>
+				<li<g:if test="${tab == "players"}"> class="active"</g:if>><a id="playersLink" href="/league/person/index">Players <span class="sr-only">(current)</span></a></li>
+
+
+
 			</ul>
+		<ul class="nav navbar-nav navbar-right">
+			<li>
+				<sec:ifLoggedIn>
+					<a id="logoutLink" name="logoutLink" href="/league/logout/index"><span class="glyphicon glyphicon-log-in"></span> Logout<span class=" sr-only">(current)</span></a>
+				</sec:ifLoggedIn>
+				<sec:ifNotLoggedIn>
+					<a id="loginlink" name="loginLink" href="/league/login/auth"><span class="glyphicon glyphicon-log-in"></span> Login</a> <span class="sr-only">(current)</span>
+				</sec:ifNotLoggedIn>
+			</li>
+		</ul>
 
 		</div><!-- /.navbar-collapse -->
 	</div><!-- /.container-fluid -->

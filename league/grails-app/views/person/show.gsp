@@ -6,12 +6,10 @@
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'person.label', default: 'Person')}" />
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
-		<script>$('#myModal').on('hidden.bs.modal', function () {
-			window.location.reload(true);
-		});</script>
+		<asset:javascript src="blogentries.js"/>
 	</head>
 	<body>
-		<div class = "container">
+	<div class = "container">
 			<div id="show-person" class="content scaffold-show" role="main">
 				<h1><g:fieldValue bean="${personInstance}" field="firstName"/>&nbsp;<g:fieldValue bean="${personInstance}" field="lastName"/></h1>
 				<g:if test="${flash.message}">
@@ -26,7 +24,7 @@
 							<li role="presentation"><a href="#seasonstats" aria-controls="2" role="tab" data-toggle="tab">Season Stats</a></li>
 							<li role="presentation"><a href="#games" aria-controls="2" role="tab" data-toggle="tab">Games</a></li>
 						</g:if>
-						<li role="presentation"><a href="#blogentry" aria-controls="2" role="tab" data-toggle="tab">Blog</a></li>
+						<li role="presentation"><a id="blogentriestab" href="#blogentries" aria-controls="2" role="tab" data-toggle="tab">Blog</a></li>
 					</ul>
 
 					<div class="tab-content">
@@ -108,12 +106,7 @@
 
 
 							</ol>
-							<g:form url="[resource:personInstance, action:'delete']" method="DELETE">
-								<fieldset class="buttons">
-									<g:link class="edit" action="edit" resource="${personInstance}"><g:message code="default.button.edit.label" default="Edit" /></g:link>
-									<g:actionSubmit class="delete" action="delete" value="${message(code: 'default.button.delete.label', default: 'Delete')}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');" />
-								</fieldset>
-							</g:form>
+
 						</div>
 						<g:if test="${personInstance.role.equals('Player')}">
 							<div role="tabpanel" class="tab-pane" id="seasonstats">
@@ -132,90 +125,9 @@
 								</table>
 							</div>
 						</g:if>
-						<div role="tabpanel" class="tab-pane" id="blogentry">
+						<div role="tabpanel" class="tab-pane" id="blogentries">
 
-							<g:if test="${flash.message}">
-								<div class="message" role="status">${flash.message}</div>
-							</g:if>
-							<br>
-							<g:if test="${!personInstance.blogEntries}"><tr><td>No blog entries</td></tr></g:if>
-							<g:else>
-								<table class="table table-striped table-bordered table-hover">
-
-										<tr><td>Discussion</td><td>Owner</td><td>Date</td><td>Text</td><td>Publish</td><td>Reply</td></tr>
-									<g:each in="${personInstance.blogEntries}" status="i" var="blogEntry">
-										<g:if test="${"Blog".equals(blogEntry.type) && (blogEntry.published || (blogEntry.owner.id == Integer.parseInt(sec.loggedInUserInfo(field: 'id').toString())))}">
-											<tr class="${(i % 2) == 1 ? 'even' : 'odd'}">
-
-												<td>${blogEntry.type}${blogEntry.id}</td>
-												<td>${fieldValue(bean: blogEntry, field: "text")}</td>
-												<td>${blogEntry.owner.username }</td>
-												<td><g:formatDate format="MMM-dd-yyyy hh:mm:ss a" date="${blogEntry.dateCreated}"/></td>
-												<td>
-													<div id="publish${blogEntry.id}">
-													<g:if test="${!blogEntry.published}">
-														<g:form controller="blogEntry" action="ajaxpublish">
-															<input type="hidden" name="blog.id" value="${blogEntry.id}"/>
-															<g:submitToRemote url="[controller:'blogEntry', action:'ajaxpublish']" update="publish${blogEntry.id}" value="Publish"/>
-														</g:form>
-													</g:if>
-													</div>
-												</td>
-												<td>
-													<div id="publish${blogEntry.id}">
-														<g:if test="${blogEntry.published}">
-															<sec:ifLoggedIn>
-																<button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModalComment">Comment</button>
-															</sec:ifLoggedIn>
-															<!--<g:form controller="blogEntry" action="ajaxpublish">
-																<input type="hidden" name="blog.id" value="${blogEntry.id}"/>
-																<g:submitToRemote url="[controller:'blogEntry', action:'ajaxpublish']" update="publish${blogEntry.id}" value="Publish"/>
-															</g:form>-->
-														</g:if>
-													</div>
-												</td>
-
-											</tr>
-											<g:each in="${blogEntry.comments}" status="j" var="comment">
-												<g:if test="${comment.approved || (blogEntry.owner.id == Integer.parseInt(sec.loggedInUserInfo(field: 'id').toString()))}">
-													<tr>
-														<td>${comment.type}${comment.id}${blogEntry.id}</td>
-														<td><g:if test="$comment.rejected"><s></g:if>${fieldValue(bean: comment, field: "text")}<g:if test="$comment.rejected"></s></g:if></td>
-														<td>${comment.owner.username }</td>
-														<td><g:formatDate format="MMM-dd-yyyy hh:mm:ss a" date="${comment.dateCreated}"/></td>
-														<td>
-															<div id="approvecomment${blogEntry.id}">
-																<g:if test="${!comment.approved && !comment.rejected}">
-																	<g:form controller="comment" action="ajaxapprove">
-																		<input type="hidden" name="blog.id" value="${blogEntry.id}"/>
-																		<input type="hidden" name="comment.id" value="${comment.id}"/>
-																		<g:submitToRemote url="[controller:'comment', action:'ajaxapprove']" update="approvecomment${blogEntry.id}" value="Approve"/>
-																	</g:form>
-																	<g:form controller="comment" action="ajaxreject">
-																		<input type="hidden" name="blog.id" value="${blogEntry.id}"/>
-																		<input type="hidden" name="comment.id" value="${comment.id}"/>
-																		<g:submitToRemote url="[controller:'comment', action:'ajaxreject']" update="approvecomment${blogEntry.id}" value="Reject"/>
-																	</g:form>
-																</g:if>
-															</div>
-														</td>
-														<td></td>
-
-													</tr>
-
-												</g:if>
-
-											</g:each>
-
-										</g:if>
-									</g:each>
-
-								</table>
-							</g:else>
-							</br></br>
-							<sec:ifLoggedIn>
-								<button type="button" class="btn btn-info" data-toggle="modal" data-target="#myModal">Create blog entry></button>
-							</sec:ifLoggedIn>
+							<g:render plugin="bio-profile" template="/blogEntry/blogentries" model="['blogentriescoll': personInstance?.blogEntries, 'userid' : sec.loggedInUserInfo(field:'id')?.toString()?.isInteger()?sec.loggedInUserInfo(field:'id').toString().toInteger():-1 ]" />
 						</div>
 					</div>
 				</div>
@@ -226,28 +138,33 @@
 
 				<!-- Modal content-->
 				<div class="modal-content">
-					<g:form controller="blogEntry" action="ajaxsave">
+					<g:form id="blogcreateform" controller="blogEntry" action="ajaxsave">
 						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<button  type="button" class="close" data-dismiss="modal">&times;</button>
 							<h4 class="modal-title">Create Blog Entry</h4>
 						</div>
 						<div class="modal-body">
 
 							<g:hiddenField name="player.id" value="${personInstance.id}" />
 							<g:hiddenField name="owner.id" value="${sec.loggedInUserInfo(field:"id")}"/>
+							<g:hiddenField name="method" value="unknown"/>
 
 
-							<div class="form-group">
-								<label for="usrname"><span class="glyphicon glyphicon-user"></span> Blog Entry</label>
-								<g:textField  class="form-control" name="text" placeholder="Enter text"/>
-							</div>
+							<fieldset class="form-group">
+								<label for="blogtext"><span class="glyphicon glyphicon-pencil"></span> Blog Entry</label>
+								<textarea id="blogtext" name="blogtext" class="form-control"  placeholder="Enter text" ></textarea>
+							</fieldset>
 
 						</div>
 						<div class="modal-footer">
-							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-							<g:submitButton name="submitbtn" class="btn btn-primary"  data-dismiss="modal action="ajaxsave" value="Submit"/>
-							<g:submitButton name="submitpubbtn" class="btn btn-primary"  data-dismiss="modal action="ajaxsave" value="Submit and Publish"/>
-
+							<g:submitToRemote id="submitbtn" name="submitbtn" before="\$('#method').val('submit')"
+											  after="\$('#blogtext').val('');\$('#myModal').modal('hide')"
+											  data-dismiss="modal" url="[controller:'blogEntry', action:'ajaxsave']"
+											  update="blogentries" value="Submit"/>
+							<g:submitToRemote id="submitpubbtn" name="submitpubbtn" before="\$('#method').val('publish')"
+											  after="\$('#blogtext').val('');\$('#myModal').modal('hide')"
+											  data-dismiss="modal" url="[controller:'blogEntry', action:'ajaxsave']"
+											  update="blogentries" value="Submit and Publish"/>
 						</div>
 
 
@@ -256,40 +173,69 @@
 
 			</div>
 		</div>
-	<div id="myModalComment" class="modal fade" role="dialog">
-		<div class="modal-dialog">
+		<div id="myModalComment" class="modal fade" role="dialog">
+			<div class="modal-dialog">
 
 			<!-- Modal content-->
-			<div class="modal-content">
-				<g:form controller="comment" action="ajaxsave">
-					<div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal">&times;</button>
-						<h4 class="modal-title">Create Comment Entry</h4>
-					</div>
-					<div class="modal-body">
-
-						<g:hiddenField name="player.id" value="${personInstance.id}" />
-						<g:hiddenField name="owner.id" value="${sec.loggedInUserInfo(field:"id")}"/>
-						<g:hiddenField name="blog.id" value="1"/>
-
-						<div class="form-group">
-							<label for="usrname"><span class="glyphicon glyphicon-user"></span> Comment Entry</label>
-							<g:textField  class="form-control" name="text" placeholder="Enter text"/>
+				<div class="modal-content">
+					<g:form id="commentcreateform" controller="comment" action="ajaxsave">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">Create Comment Entry</h4>
 						</div>
+						<div class="modal-body">
 
-					</div>
-					<div class="modal-footer">
+							<g:hiddenField name="player.id" value="${personInstance.id}" />
+							<g:hiddenField name="owner.id" value="${sec.loggedInUserInfo(field:"id")}"/>
+							<g:hiddenField name="blog.id" value="1" id="blogid"/>
+
+							<fieldset class="form-group">
+								<label for="commenttext"><span class="glyphicon glyphicon-pencil"></span> Comment Entry</label>
+								<textarea type="text" id="commenttext" name="commenttext" class="form-control"  placeholder="Enter text"></textarea>
+							</fieldset>
+
+						</div>
+						<div class="modal-footer">
 						<!--button type="button" class="btn btn-default" data-dismiss="modal">Close</button-->
-						<div id="commentsubmit"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button><g:submitButton name="submitbtn" class="btn btn-primary"  data-dismiss="modal action="ajaxsave" value="Submit"/></div>
 
-
+							<!--g:submitButton name="submitbtn" class="btn btn-primary"  data-dismiss="modal action="ajaxsave" value="Submit"/-->
+							<g:submitToRemote name="submitbtn" before="" after="\$('#commenttext').val('');\$('#myModalComment').modal('hide')" data-dismiss="modal" url="[controller:'comment', action:'ajaxsave']" update="blogentries" value="Publish Comment"/>
+						</div>
 					</div>
-
-
 				</g:form>
 			</div>
 		</div>
-	</div>
+		<div id="myModalResponse" class="modal fade" role="dialog">
+			<div class="modal-dialog">
 
+				<!-- Modal content-->
+				<div class="modal-content">
+					<g:form id="responsecreateform" controller="comment" action="ajaxsave">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title">Create Response Entry</h4>
+						</div>
+						<div class="modal-body">
+
+							<g:hiddenField name="player.id" value="${personInstance.id}" />
+							<g:hiddenField name="owner.id" value="${sec.loggedInUserInfo(field:"id")}"/>
+							<g:hiddenField name="blog.id" value="1" id="blogid"/>
+							<g:hiddenField name="comment.id" value="1" id="commentid"/>
+							<fieldset class="form-group">
+								<label for="responsetext"><span class="glyphicon glyphicon-pencil"></span> Response Entry</label>
+								<textarea type="text" id="responsetext" name="responsetext" class="form-control"  placeholder="Enter text"></textarea>
+							</fieldset>
+
+						</div>
+						<div class="modal-footer">
+							<!--button type="button" class="btn btn-default" data-dismiss="modal">Close</button-->
+
+							<!--g:submitButton name="submitbtn" class="btn btn-primary"  data-dismiss="modal action="ajaxsave" value="Submit"/-->
+							<g:submitToRemote name="submitbtn" before="" after="\$('#responsetext').val('');\$('#myModalResponse').modal('hide')" data-dismiss="modal" url="[controller:'response', action:'ajaxsave']" update="blogentries" value="Publish Response"/>
+						</div>
+					</g:form>
+				</div>
+			</div>
+		</div>
 	</body>
 </html>

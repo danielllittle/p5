@@ -1,6 +1,6 @@
 package cscie56.ps5
 
-
+import grails.plugin.springsecurity.annotation.Secured
 
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
@@ -10,9 +10,82 @@ class ResponseController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
+    def springSecurityService
+
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
         respond Response.list(params), model:[responseCount: Response.count()]
+    }
+
+    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
+    @Transactional
+    def ajaxapprove() {
+        println "ajaxpublishcomments begin"
+        BlogEntry blogEntry = BlogEntry.findById(params.getLong("blog.id"))
+        if (blogEntry.owner.id != springSecurityService.principal.id) {
+            render "unauthorized"
+        } else {
+            Response response = Response.findById(params.getLong("response.id"))
+            response.approved = true
+            if (!response.save(flush: true)) response.errors.allErrors.each {
+                println it
+            } else println "saved " + response
+            //blogEntry.save flush:true
+            println "ajaxpublishcomments end"
+            render (plugin: "bio-profile", template: "/response/response_row", model: ['resp': response, 'blog' : blogEntry] )
+
+        }
+    }
+
+    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
+    @Transactional
+    def ajaxreject() {
+        println "ajaxreject begin"
+        BlogEntry blogEntry = BlogEntry.findById(params.getLong("blog.id"))
+        if (blogEntry.owner.id != springSecurityService.principal.id) {
+            render "unauthorized"
+        } else {
+            Response response = Response.findById(params.getLong("response.id"))
+            response.rejected = true
+            if (!response.save(flush: true)) response.errors.allErrors.each {
+                println it
+            } else println "saved " + response
+            //blogEntry.save flush:true
+            println "ajaxreject end"
+            render (plugin: "bio-profile", template: "/response/response_row", model: ['resp': response, 'blog' : blogEntry])
+
+        }
+
+    }
+
+    @Secured(['ROLE_USER', 'ROLE_ADMIN'])
+    @Transactional
+    def ajaxsave() {
+        println "ajaxsave begin - response"
+        Response response = new Response()
+        response.dateCreated = new Date();
+        println "ajaxsave begin - response test "
+        response.text = (String) params.get("responsetext")
+        response.published = true
+        response.datePublished = new Date()
+        response.errors.allErrors.each{println it}
+        User person = User.findById(params.getLong("player.id"))
+        println "ajaxsave after findplay"
+        response.player = person
+        response.owner = springSecurityService.currentUser
+        if (!response.save(flush: true)) response.errors.allErrors.each{println it} else println "saved " + response
+        println "loading comment with id: " + params.getLong("comment.id")
+
+        Comment comment = Comment.findById(params.getLong("comment.id"))
+
+        comment.addToResponses(response)
+        println "ajaxsave saving"
+        comment.save flush:true
+
+        println "ajaxsave end"
+
+        render(plugin: "bio-profile", template:"/blogEntry/blogentries", model: ['blogentriescoll' : person?.blogEntries, 'userid' : springSecurityService.principal.id])
+        //render status: NO_CONTENT
     }
 
     def show(Response response) {

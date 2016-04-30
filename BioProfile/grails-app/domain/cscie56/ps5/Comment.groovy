@@ -9,6 +9,10 @@ class Comment extends BlogEntry {
 
 
     static belongsTo = [ blogEntry : BlogEntry ]
+    static hasMany = [responses : Response]
 
+    static mapping = {
+        sort datePublished: "desc"
+    }
 
 }

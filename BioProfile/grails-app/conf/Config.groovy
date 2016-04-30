@@ -19,6 +19,8 @@ log4j = {
            'org.springframework',
            'org.hibernate',
            'net.sf.ehcache.hibernate'
+
+    grails.plugin.springsecurity.logout.postOnly = false
 }
 
 

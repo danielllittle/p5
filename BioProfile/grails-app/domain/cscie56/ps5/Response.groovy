@@ -7,5 +7,7 @@ class Response extends Comment {
     static constraints = {
     }
 
-    static belongsTo = [ comment : BlogEntry ]
+    static belongsTo = [ comment : Comment ]
+
+    static mappedBy = [responses:'responses']
 }
